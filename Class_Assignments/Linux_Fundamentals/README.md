@@ -5,6 +5,14 @@
 
 ---
 
+> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
+> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
+> commands** shown above them, so the text in every image is the genuine output of that run — the
+> raw transcripts are committed alongside this file. They are provided in addition to the text
+> blocks so the output is both readable as an image and selectable as text.
+
+---
+
 ## How this was run
 
 My own machine is macOS, and the commands in this homework — `adduser`, `useradd`, `journalctl` — are Linux-only. Rather than skip them or paste output from somewhere else, I built a real Ubuntu 24.04 environment in Docker with **systemd actually running as PID 1**, so `journalctl` has a genuine journal to read instead of returning "No journal files were found".
@@ -122,6 +130,8 @@ hard.txt:     ASCII text
 
 Note `file` reports `hard.txt` as plain `ASCII text`, not as a link. There is no way to tell "which one was the original" — because there is no original. Both names are equal.
 
+![creating a soft and hard link, with ls -li showing the shared inode 824827 and link count 2](images/task1-1-create-links.png)
+
 ### Writing through a link
 
 ```bash
@@ -176,6 +186,8 @@ hard.txt -> inode=824827 links=1
 
 The hard link still has every byte, including the line appended earlier. Deleting `original.txt` removed a *name*, not the file.
 
+![deleting the original: the soft link dangles while the hard link keeps all data](images/task1-2-delete-original.png)
+
 ### Directories
 
 ```bash
@@ -209,6 +221,8 @@ total 8
 ```
 
 Important detail: `rm` on a symlink removes **the link**, not the target. But `rm softlink/` with a trailing slash, or `rm -r` on a symlink to a directory, can behave differently — so it is worth being deliberate.
+
+![soft link to a directory allowed, hard link to a directory refused](images/task1-3-directories.png)
 
 ### Interview summary
 
@@ -298,6 +312,8 @@ useradduser L 2026-09-03 0 99999 7 -1
 
 Now the home directory exists, and `-s /bin/bash` gave it a usable shell. But `passwd -S` reports **`L`** — the account is **locked**, with no password set. It cannot log in until you separately run `passwd useradduser`.
 
+![useradd with and without -m, showing the missing home directory](images/task2-1-useradd.png)
+
 ### `adduser`: the recommended way
 
 `adduser` is normally **interactive** — it prompts for the password and for the GECOS fields (full name, room, phone). To run it non-interactively for this transcript I passed `--disabled-password --gecos ''`:
@@ -362,6 +378,8 @@ Things `adduser` did that `useradd` did not:
 - added the user to the supplementary `users` group
 - picked the UID from Debian's configured range for human accounts
 
+![adduser creating the home directory, copying /etc/skel and adding group membership](images/task2-2-adduser.png)
+
 ### Side by side
 
 ```bash
@@ -406,6 +424,9 @@ info: Removing user `nohomeuser' ...
 `deluser` also cleaned up the user's crontab, which `userdel` left alone. One practical note: `deluser --remove-home` needs the `perl` package installed, and fails with an explicit error if it is missing.
 
 ---
+
+![userdel -r and deluser --remove-home deleting the test users](images/task2-3-delete-users.png)
+
 
 ## Task 3: journalctl
 
@@ -471,6 +492,8 @@ Sep 03 16:08:46 devops-lab kernel: Zone ranges:
 Sep 03 16:08:46 devops-lab kernel:   DMA      [mem 0x0000000070000000-0x00000000ffffffff]
 ```
 
+![journalctl version, disk usage and the most recent system log entries](images/task3-1-journalctl-system.png)
+
 ### Checking logs for a specific service — `-u`
 
 This is the flag worth actually remembering. `-u <unit>` restricts output to one systemd unit.
@@ -526,6 +549,8 @@ Sep 03 16:09:23 devops-lab systemd[1]: Started nginx.service - A high performanc
 ```
 
 The full stop → deactivate → start cycle of the restart, in order. This is exactly the workflow for debugging a service that will not come up: `systemctl status` for the current state, `journalctl -u <service>` for *why*.
+
+![journalctl -u ssh and -u nginx showing logs for one service only](images/task3-2-journalctl-service.png)
 
 ### Filtering, which is the real value
 
@@ -587,6 +612,8 @@ journalctl -u nginx -n 1 -o json-pretty --no-pager | head -12
 
 All that metadata is attached to every entry automatically. It is what makes the filtering above possible, and it is what a plain text log file cannot give you.
 
+![journalctl -p err and --since filtering the journal](images/task3-3-journalctl-filter.png)
+
 ### Flags worth memorising
 
 | Command | What it does |
@@ -634,6 +661,8 @@ project
 
 3 directories, 0 files
 ```
+
+![cheat sheet: pwd, mkdir -p and tree](images/task4-1-navigation-files.png)
 
 ### Creating, copying, moving, deleting
 
@@ -719,6 +748,8 @@ find . -type d
 
 `grep` searches *inside* files; `find` searches *for* files by name, type, size, or age. Easy to mix up.
 
+![cheat sheet: cat, head, tail, wc, grep and find](images/task4-2-read-search.png)
+
 ### Text processing
 
 ```bash
@@ -751,6 +782,8 @@ echo 40
 
 Two things I had to get right here: `sort -n` is **numeric** sort (without it, `10` sorts before `5` because it compares as text), and **`uniq -c` only collapses adjacent duplicates**, so it is almost always preceded by `sort`.
 
+![cheat sheet: sort, cut, uniq, awk, sed and tr](images/task4-3-text-processing.png)
+
 ### Permissions and ownership
 
 ```bash
@@ -781,6 +814,8 @@ chown testuser:testuser data.txt && ls -l data.txt
 ```
 
 Reading the mode: three groups of three — **owner, group, other** — each `r`(4) `w`(2) `x`(1). So `755` = owner `rwx`, group `r-x`, other `r-x`. `644` = owner `rw-`, everyone else read-only. `chmod` changes permissions, `chown` changes who owns it.
+
+![cheat sheet: chmod and chown changing permissions and ownership](images/task4-4-permissions.png)
 
 ### Processes
 
@@ -822,6 +857,8 @@ killed it
 ```
 
 The `| grep -v grep` is there because the `grep` process itself matches the pattern. `pgrep`/`pkill` avoid that problem entirely, which is why they are the better habit.
+
+![cheat sheet: ps, pgrep and pkill finding and killing a process](images/task4-5-processes.png)
 
 ### Disk and memory
 
@@ -879,6 +916,8 @@ Linux devops-lab 6.12.76-linuxkit #1 SMP Fri May 29 10:00:01 UTC 2026 aarch64 aa
 
 `load average` is three numbers — 1, 5 and 15 minute averages of runnable processes. Compare against the CPU count: a load of 4.0 is fine on 10 cores and badly overloaded on 2.
 
+![cheat sheet: df, du, free, uname and uptime](images/task4-6-disk-memory-sysinfo.png)
+
 ### Archives and compression
 
 ```bash
@@ -910,6 +949,8 @@ ls: cannot access '/nonexistent': No such file or directory
 ```
 
 The distinction that matters: `>` is **destructive** — it truncates the file immediately, before the command even runs. `>>` appends. And stdout (`1`) and stderr (`2`) are separate streams, which is why an error can still appear on your terminal even when you redirected "the output".
+
+![cheat sheet: tar, gzip, redirection and pipes](images/task4-7-archives-redirection.png)
 
 ### Services
 

@@ -7,6 +7,14 @@ All output below was captured from a real run on my machine (Docker `29.5.3`, Do
 
 ---
 
+> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
+> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
+> commands** shown above them, so the text in every image is the genuine output of that run — the
+> raw transcripts are committed alongside this file. They are provided in addition to the text
+> blocks so the output is both readable as an image and selectable as text.
+
+---
+
 ## Task 1: Docker Container Networking
 
 - Create 3 containers: Frontend, Backend, Database
@@ -82,6 +90,8 @@ frontend   nginx:alpine    Up 5 seconds
 
 `sleep infinity` is needed on the alpine container because a container lives only as long as its main process — plain `alpine` would run its default shell, find no input, and exit immediately.
 
+![three networks and three containers created](images/task1-1-create-networks.png)
+
 ### Add the backend container to 2 more networks
 
 The backend has to talk to both the frontend and the database, so it gets attached to their networks too:
@@ -110,6 +120,8 @@ database-net=172.22.0.2
 ```
 
 The backend has **three IP addresses on three different subnets** — one interface per network it joined. The frontend and database have exactly one each.
+
+![backend attached to two more networks, holding three IPs on three subnets](images/task1-2-backend-multihomed.png)
 
 ### Check connectivity — from the backend
 
@@ -179,6 +191,8 @@ PING backend (172.20.0.3): 56 data bytes
 
 Works — they share `frontend-net`. And it resolved the backend to `172.20.0.3`, the backend's address **on that specific network**, not one of its other two.
 
+![backend pinging both frontend and database by container name with 0% loss](images/task1-3-connectivity.png)
+
 ### The isolation test — frontend to database
 
 ```bash
@@ -235,6 +249,8 @@ docker exec backend  getent hosts database   # 172.22.0.2  database
 
 Exactly the three-tier isolation intended: the backend is the only path between the frontend and the database.
 
+![DNS resolution matrix showing frontend cannot resolve database](images/task1-5-dns-isolation.png)
+
 ### Confirming the database is a real MySQL server
 
 ```bash
@@ -279,6 +295,8 @@ Subnet: 172.22.0.0/16  Driver: bridge
 database = 172.22.0.2/16
 backend = 172.22.0.3/16
 ```
+
+![docker network inspect showing the subnet and member containers of each network](images/task1-4-network-inspect.png)
 
 Docker allocated a separate subnet per network automatically, and `backend` appears in all three with a different address in each.
 
@@ -340,6 +358,8 @@ AH00558: httpd: Could not reliably determine the server's fully qualified domain
 
 Apache started and is serving. Note the address it picked up: **`192.168.65.3`**.
 
+![apache running on the host network with an empty PORTS column](images/task2-1-host-network.png)
+
 ### An important platform caveat, stated honestly
 
 Accessing it from macOS did **not** work:
@@ -384,6 +404,8 @@ HTTP 200
 
 **HTTP 200, "It works!", over port 80, with no port publishing at all.** Two separate containers sharing one network namespace.
 
+![a second host-network container reaching apache on localhost:80 with HTTP 200 and no port publishing](images/task2-2-host-vs-bridge.png)
+
 ### The contrast with a bridge container
 
 The same request from a **bridge** container, which has its own namespace:
@@ -420,6 +442,8 @@ docker-desktop
 ```
 
 The container's hostname is **`docker-desktop`** — the VM's hostname, not a container ID. And it can see `docker0` and the `br-*` bridges from Task 1, which a normally-isolated container never could. It is genuinely inside the host's network namespace.
+
+![identical curl from a bridge container failing, proving the namespace difference](images/task2-3-apache-port80.png)
 
 ### Satisfying "access on port 80" from the browser
 
@@ -535,6 +559,8 @@ The container reads the identical file, and I recorded `StartedAt` so I can prov
 
 ![Nginx serving Hello students from a bind-mounted folder](images/bindmount-before.png)
 
+![bind mount created and nginx serving Hello students from the host folder](images/task3-1-bindmount-setup.png)
+
 ### 4. Modify index.html on the host
 
 The container is left running and untouched:
@@ -587,6 +613,8 @@ nginx-bind -> Up 7 seconds
 **`StartedAt` is byte-identical to the value recorded in step 3**, and `RestartCount` is still `0`. The container has been running continuously the whole time.
 
 ![Nginx serving the edited content without any restart](images/bindmount-after.png)
+
+![the edited file served immediately with StartedAt unchanged and RestartCount still 0](images/task3-2-bindmount-live-update.png)
 
 ### 7. Writes flow both ways
 
@@ -740,6 +768,8 @@ p7163974cpqg   ingress   overlay   swarm
 
 Note **`SCOPE: swarm`**, not `local` — this network is a cluster-wide object, unlike every bridge in Task 1.
 
+![overlay creation failing without swarm, then docker swarm init succeeding](images/task4-1-overlay-swarm-init.png)
+
 ### Create an overlay network
 
 ```bash
@@ -790,6 +820,8 @@ HTTP 200
 
 `-p 8095:80` on a service publishes through the swarm **routing mesh**: port 8095 is open on **every** node in the cluster, and a request to any node is load-balanced to a healthy replica wherever it runs. You can hit a node that hosts no replica at all and still get a response.
 
+![overlay network created with scope swarm and a 3-replica service running on it](images/task4-2-overlay-create-service.png)
+
 ### Service discovery — the part that shows overlay DNS
 
 ```bash
@@ -830,6 +862,8 @@ app-overlay-endpoint = 10.0.1.6/24
 ```
 
 The service has one VIP on `ingress` and one on `app-overlay`, and each replica has its own overlay address. On a multi-host cluster this listing would be identical in shape — the only difference is that the containers would be running on different physical machines.
+
+![web resolving to a single VIP while tasks.web returns all three replica addresses](images/task4-3-overlay-service-discovery.png)
 
 ### Use cases
 
@@ -873,6 +907,8 @@ Swarm: inactive
 
 NETWORK ID   NAME      DRIVER    SCOPE
 ```
+
+![cleanup removing the service and overlay, and leaving swarm](images/task4-4-overlay-cleanup.png)
 
 Swarm inactive and no overlay networks remain — my Docker installation is back to how it started.
 

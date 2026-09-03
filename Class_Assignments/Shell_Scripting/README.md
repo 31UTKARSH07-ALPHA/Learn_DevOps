@@ -5,6 +5,14 @@
 
 ---
 
+> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
+> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
+> commands** shown above them, so the text in every image is the genuine output of that run — the
+> raw transcripts are committed alongside this file. They are provided in addition to the text
+> blocks so the output is both readable as an image and selectable as text.
+
+---
+
 ## Task: System Information Script
 
 Create a shell script that:
@@ -242,6 +250,9 @@ Line count: 38 lines
 
 ---
 
+![full run of script.sh showing date, hostname, username, disk usage, processes and the read -p prompts](images/script-run.png)
+
+
 ## The file the script created
 
 The task's last requirement is that the running-process information ends up **in a file** via `>` redirection. Verifying that the file really exists with real content:
@@ -296,6 +307,8 @@ wc -l /root/myreport/proc_list.txt
 ```
 38 /root/myreport/proc_list.txt
 ```
+
+![the generated proc_list.txt file containing the report header, disk usage and process table](images/report-file.png)
 
 38 lines, 2799 bytes, containing the header, the disk usage and the full process table.
 

@@ -7,6 +7,14 @@ All output in this file was captured from an actual run on my machine (macOS, `g
 
 ---
 
+> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
+> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
+> commands** shown above them, so the text in every image is the genuine output of that run — the
+> raw transcripts are committed alongside this file. They are provided in addition to the text
+> blocks so the output is both readable as an image and selectable as text.
+
+---
+
 ## Task 1: `git commit -a -m` vs `git commit -m`
 
 - Practice `git commit -a -m "message"`.
@@ -39,6 +47,8 @@ Initialized empty Git repository in .../git-practice/.git/
  1 file changed, 1 insertion(+)
  create mode 100644 file1.txt
 ```
+
+![git init and the first commit](images/task1-1-setup.png)
 
 Now I modify a **tracked** file and create an **untracked** one, so both cases exist at the same time:
 
@@ -83,6 +93,8 @@ no changes added to commit (use "git add" and/or "git commit -a")
 [exit code: 1]
 ```
 
+![git commit -m with nothing staged, failing with exit code 1](images/task1-2-commit-m-fails.png)
+
 **Nothing was committed.** The command exited with code `1` because the staging area was empty. Git even hints at the fix in its own message: `use "git add" and/or "git commit -a"`.
 
 ### Attempt 2 — `git commit -a -m`
@@ -123,6 +135,8 @@ git log --oneline --stat
  file1.txt | 1 +
  1 file changed, 1 insertion(+)
 ```
+
+![git commit -a -m succeeding, then git status and git log showing only file1.txt committed](images/task1-3-commit-a-m.png)
 
 ### Explanation of what I observed
 
@@ -193,6 +207,8 @@ main
 
 Four commits on `main`.
 
+![four commits on main shown by git log --oneline](images/task2-1-main-commits.png)
+
 ### Step 3 — create a new branch and make 3 commits on it
 
 ```bash
@@ -247,6 +263,8 @@ Date:   Thu Sep 3 21:36:11 2026 +0530
  feature2.txt | 1 +
  1 file changed, 1 insertion(+)
 ```
+
+![three commits on the feature branch and git show identifying commit 85295b4](images/task2-2-feature-commits.png)
 
 ### Step 5 — switch back to `main` and confirm the change is not there yet
 
@@ -311,6 +329,8 @@ feature work 2 -- THIS is the one we cherry-pick
 
 **Verified.** `feature2.txt` is on `main` with the correct contents, and `feature1.txt` / `feature3.txt` are **not** — exactly one commit came across.
 
+![git cherry-pick creating commit d6acc02 on main, and verification that feature2.txt is present](images/task2-3-cherry-pick.png)
+
 ### The commit graph, which shows it best
 
 ```bash
@@ -328,6 +348,8 @@ git log --oneline --graph --all --decorate
 * 43257b2 Commit with -a: auto-stages tracked modified files
 * 8bfb41a Initial commit: add file1.txt
 ```
+
+![git log --graph --all showing Feature commit 2 appearing twice with different hashes](images/task2-4-commit-graph.png)
 
 This graph is the clearest evidence of what happened. Both branches fork from `043413e`. The message "Feature commit 2" now appears **twice** — once as `85295b4` on `feature`, once as `d6acc02` on `main`. The branches were never merged; the change was copied.
 

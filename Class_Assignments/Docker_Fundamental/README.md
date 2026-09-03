@@ -5,6 +5,14 @@
 
 ---
 
+> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
+> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
+> commands** shown above them, so the text in every image is the genuine output of that run — the
+> raw transcripts are committed alongside this file. They are provided in addition to the text
+> blocks so the output is both readable as an image and selectable as text.
+
+---
+
 ## Task: Hello World Applications
 
 Create simple **Hello World** web applications using Docker for:
@@ -66,6 +74,8 @@ port 3005 -> HTTP 200  |  327 bytes  |  0.001173s
 port 3006 -> HTTP 200  |  365 bytes  |  0.000780s
 ```
 
+![curl verification of all six apps, each returning HTTP 200 with its Hello World heading](images/verify-all-six.png)
+
 ```bash
 docker images --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}'
 ```
@@ -79,6 +89,8 @@ apache-hello    latest    205MB
 python-hello    latest    234MB
 node-hello      latest    194MB
 ```
+
+![docker ps showing all six containers running with their port mappings, and docker images with their sizes](images/docker-ps-all-six.png)
 
 ### A note on ports
 

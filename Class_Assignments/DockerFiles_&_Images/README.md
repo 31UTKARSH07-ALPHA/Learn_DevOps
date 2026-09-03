@@ -5,6 +5,14 @@
 
 ---
 
+> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
+> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
+> commands** shown above them, so the text in every image is the genuine output of that run — the
+> raw transcripts are committed alongside this file. They are provided in addition to the text
+> blocks so the output is both readable as an image and selectable as text.
+
+---
+
 ## Task 1: Run Multi-Stage Dockerfile
 
 - Clone the repository containing the multi-stage Dockerfile.
@@ -208,6 +216,8 @@ d14535318c7e   apache-hello      "httpd-foreground"       4 minutes ago   Up 4 m
 
 **Confirmed: `0.0.0.0:8080->8080/tcp`** — the application is running on port 8080 as the task requires.
 
+![docker run and docker ps showing the multi-stage container mapped on port 8080](images/multistage-run-and-ps.png)
+
 ### Access the application and verify the message
 
 ```bash
@@ -248,6 +258,8 @@ Multi-stage app listening on port 8080
 
 The `Container hostname: c7ff8da02501` on the page matches the container ID from `docker run`, and `Listening on port: 8080` is reported by the app itself.
 
+![curl returning Hello World from Docker multi-stage build on port 8080](images/multistage-access-app.png)
+
 ### Proof the build stage really was discarded
 
 This is the part that shows multi-stage actually did something:
@@ -281,6 +293,8 @@ node
 ```
 
 No `node_modules`, no `esbuild`, and the process runs as the unprivileged `node` user.
+
+![proof the final image has no node_modules, no esbuild, and runs as the node user](images/multistage-proof-no-deps.png)
 
 ### Measuring the benefit
 
@@ -380,6 +394,9 @@ port 8083 -> HTTP 200 | 514 bytes | <h1>Hello World from Java</h1>
 ```
 
 ---
+
+![all three multi-stage deployments built, running and returning HTTP 200 on ports 8081, 8082 and 8083](images/deploy-three-apps.png)
+
 
 ### 1. nodejs-app — bundle, then discard dependencies
 
