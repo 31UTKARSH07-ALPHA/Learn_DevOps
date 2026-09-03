@@ -7,14 +7,6 @@ All output below was captured from a real run on my machine (Docker `29.5.3`, Do
 
 ---
 
-> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
-> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
-> commands** shown above them, so the text in every image is the genuine output of that run — the
-> raw transcripts are committed alongside this file. They are provided in addition to the text
-> blocks so the output is both readable as an image and selectable as text.
-
----
-
 ## Task 1: Docker Container Networking
 
 - Create 3 containers: Frontend, Backend, Database
@@ -960,26 +952,33 @@ docker service rm web; docker network rm app-overlay; docker swarm leave --force
 
 ## What I took away
 
-**Networks are the isolation boundary.** Containers on a shared user-defined network reach each other **by name**; containers with no shared network cannot resolve each other at all. `frontend` → `database` failed with `bad address`, not a timeout — Docker's DNS is scoped per network, so isolation happens before a packet is even sent. That is a stronger guarantee than firewall rules and it is the default.
+**Networks are the isolation boundary.** Containers sharing a user-defined network reach each other
+**by name**; containers with no shared network cannot even resolve each other. `frontend` → `database`
+failed with `bad address`, not a timeout — Docker's DNS is scoped per network, so isolation happens
+before a packet is sent. That is stronger than firewall rules, and it is the default.
 
-**Multi-homing is how you build tiers.** `docker network connect` attaches a running container to more networks with no restart. Putting only the backend on both the frontend and database networks produces real three-tier isolation, and `docker inspect` showed it holding three IPs on three subnets.
+**Multi-homing is how you build tiers.** `docker network connect` attaches a running container to
+more networks with no restart. Putting only the backend on both networks gives real three-tier isolation.
 
-**The four network modes, and when each applies:**
+**The four network modes:**
 
 | Mode | Isolation | Reach it via | Use for |
 |---|---|---|---|
 | `bridge` (user-defined) | Own namespace | `-p host:container` | Almost everything |
-| `host` | **None**, shares the host | Host's own ports directly | Performance-critical, port scanners |
+| `host` | **None**, shares the host | Host's ports directly | Performance-critical |
 | `none` | Total, no networking | Nothing | Untrusted batch jobs |
 | `overlay` | Own namespace, **across hosts** | Service VIP / routing mesh | Clusters |
 
-**Platform differences are real and worth knowing.** Two of the four tasks behaved differently on Docker Desktop than they would on native Linux:
+**Platform differences are real.** Two tasks behaved differently on Docker Desktop than on native Linux:
 
-- `--network host` attaches to the **VM's** namespace, so `localhost:80` on macOS does not reach it. The `PORTS` column being empty is the tell.
-- Bind mounts cross a VM filesystem boundary, which introduces attribute caching — and caused genuinely truncated HTTP responses until I set `sendfile off`.
+- `--network host` attaches to the **VM's** namespace, so macOS `localhost:80` does not reach it. The empty `PORTS` column is the tell.
+- Bind mounts cross a VM filesystem boundary, which caused truncated HTTP responses until I set `sendfile off`.
 
-Neither is a misconfiguration, and neither would happen on Linux. Knowing *why* the platform behaves this way is the difference between fixing it and guessing.
+Neither is a misconfiguration, and neither happens on Linux.
 
-**Bind mounts for development, named volumes for data.** Editing `index.html` on the host changed what nginx served with an unchanged `StartedAt` and `RestartCount: 0` — no restart, no rebuild. That is the whole development-workflow argument. But bind mounts depend on host paths, which is why production data belongs in named volumes.
+**Bind mounts for development, named volumes for data.** Editing `index.html` changed what nginx
+served with `StartedAt` unchanged and `RestartCount: 0` — no restart, no rebuild.
 
-**Overlay is bridge plus a cluster.** Same DNS-by-name model, extended across machines via VXLAN encapsulation over UDP 4789, with cluster state kept in swarm's Raft store. The service VIP (`web` → one address, load-balanced) versus `tasks.web` (→ all replica addresses) is the practical distinction, and the reason an application can scale from 3 replicas to 30 without a single client-side change.
+**Overlay is bridge plus a cluster.** Same DNS-by-name model extended across machines via VXLAN over
+UDP 4789. The service VIP (`web` → one load-balanced address) versus `tasks.web` (→ all replicas) is
+the practical distinction, and why an app can scale 3 → 30 replicas with no client change.

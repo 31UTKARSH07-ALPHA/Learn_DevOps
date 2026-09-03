@@ -5,14 +5,6 @@
 
 ---
 
-> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
-> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
-> commands** shown above them, so the text in every image is the genuine output of that run — the
-> raw transcripts are committed alongside this file. They are provided in addition to the text
-> blocks so the output is both readable as an image and selectable as text.
-
----
-
 ## Task 1: Run Multi-Stage Dockerfile
 
 - Clone the repository containing the multi-stage Dockerfile.
@@ -589,13 +581,13 @@ docker rm -f multistage-app deploy-node deploy-python deploy-java
 
 ## What I took away
 
-**The pattern is always the same**, whatever the language:
+**The pattern is always the same:**
 
-1. Stage 1 starts from a **fat** image that has the build tooling, and produces an artifact.
+1. Stage 1 starts from a **fat** image with the build tooling and produces an artifact.
 2. Stage 2 starts from a **slim** image and `COPY --from=` only that artifact.
 3. Anything not copied is thrown away.
 
-What the artifact *is* differs by ecosystem, and that is the interesting part:
+What the artifact is differs by ecosystem:
 
 | Language | Build stage produces | Runtime does not need |
 |---|---|---|
@@ -605,22 +597,20 @@ What the artifact *is* differs by ecosystem, and that is the interesting part:
 | React | Static HTML/CSS/JS | Node, npm, Vite |
 | Go / Rust | A single static binary | The entire compiler |
 
-**Measured results from this assignment**, all on the same machine:
-
-- Node bundle: **1.6GB → 194MB** (~8x)
-- Java JDK → JRE: **555MB → 286MB** (~48%)
+**Measured here:** Node bundle **1.6GB → 194MB** (~8x); Java JDK → JRE **555MB → 286MB** (~48%).
 
 **Why it matters beyond size:**
 
-- **Faster deploys.** Pulling 194MB instead of 1.6GB on every node, every rollout.
-- **Smaller attack surface.** No compiler, no shell utilities, no source code in the shipped image. A vulnerability in a build tool cannot be exploited in an image that does not contain it.
-- **Cleaner separation.** Build-time and run-time dependencies are stated explicitly in the Dockerfile, instead of being tangled together.
-- **Secrets do not leak.** A private token used in stage 1 is not in the final image at all — whereas deleting a file in a later `RUN` of a single-stage build leaves it in the earlier **layer**, still recoverable from the image history. This is the subtle one, and probably the strongest argument for multi-stage.
+- **Faster deploys** — pulling 194MB instead of 1.6GB on every rollout.
+- **Smaller attack surface** — no compiler, no source in the shipped image.
+- **Secrets do not leak.** A token used in stage 1 is absent from the final image entirely, whereas
+  deleting a file in a later `RUN` of a single-stage build leaves it in the earlier **layer**, still
+  recoverable. This is the strongest argument for multi-stage.
 
-**Practical details I had to get right:**
+**Details to get right:**
 
-- Name stages with `AS <name>` and reference them as `COPY --from=<name>`; a bare index like `--from=0` works but is fragile.
-- `COPY --from` reads from the **stage's filesystem**, so the path must be where that stage actually wrote it (`/app/dist/...`, `/wheels`, `/app/out`).
-- Delete intermediates in the **same `RUN`** that created them (`&& rm -rf /wheels`), because each `RUN` is its own layer and a later deletion does not shrink an earlier one.
-- Copy the dependency manifest before the source in every stage, so editing code does not invalidate the dependency-install cache.
-- `openjdk:*` base images are deprecated and no longer resolve — `eclipse-temurin` is the current official OpenJDK.
+- Name stages with `AS <name>`; a bare `--from=0` works but is fragile.
+- `COPY --from` paths must match where that stage actually wrote the files.
+- Delete intermediates in the **same `RUN`** that created them — each `RUN` is its own layer.
+- Copy the dependency manifest before the source, in every stage.
+- `openjdk:*` images are deprecated; use `eclipse-temurin`.

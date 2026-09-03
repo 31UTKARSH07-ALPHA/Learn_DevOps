@@ -5,14 +5,6 @@
 
 ---
 
-> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
-> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
-> commands** shown above them, so the text in every image is the genuine output of that run — the
-> raw transcripts are committed alongside this file. They are provided in addition to the text
-> blocks so the output is both readable as an image and selectable as text.
-
----
-
 ## Task: System Information Script
 
 Create a shell script that:
@@ -335,7 +327,8 @@ read -p "Enter a name for the report directory: " DIR_NAME
 
 `read` takes a line from stdin into a variable; `-p` prints a prompt first.
 
-Something I ran into while capturing this transcript, worth recording: bash **only displays the `-p` prompt when stdin is a terminal.** My first capture piped input into the script and the prompts were invisible in the log, even though the values were read correctly. I re-ran it under a pseudo-terminal (`script -qec ./script.sh /dev/null`) to get a faithful transcript. That is why both prompts appear on one line above — the second prompt printed immediately after the first input was consumed.
+One thing to know: bash only shows the `-p` prompt when stdin is a terminal. Both prompts appear on
+one line above because the second printed as soon as the first input was consumed.
 
 ### Default values
 

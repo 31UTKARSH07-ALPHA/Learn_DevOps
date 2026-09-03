@@ -5,53 +5,19 @@
 
 ---
 
-> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
-> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
-> commands** shown above them, so the text in every image is the genuine output of that run — the
-> raw transcripts are committed alongside this file. They are provided in addition to the text
-> blocks so the output is both readable as an image and selectable as text.
-
----
-
 ## How this was run
 
-My own machine is macOS, and the commands in this homework — `adduser`, `useradd`, `journalctl` — are Linux-only. Rather than skip them or paste output from somewhere else, I built a real Ubuntu 24.04 environment in Docker with **systemd actually running as PID 1**, so `journalctl` has a genuine journal to read instead of returning "No journal files were found".
-
-The image and the exact scripts I ran are in [`lab/`](lab/), and the full untrimmed transcripts are in
-[`lab/linux_task_output.txt`](lab/linux_task_output.txt) and [`lab/cheat_sheet_output.txt`](lab/cheat_sheet_output.txt).
+macOS has no `adduser`, `useradd` or `journalctl`, so I ran these in an Ubuntu 24.04 container with
+systemd as PID 1 — otherwise `journalctl` has no journal to read.
 
 ```bash
-# build the lab image (Dockerfile in lab/)
 docker build -t linux-lab:24.04 lab/
-
-# systemd needs these flags to run as PID 1 inside a container
 docker run -d --name linux-lab --hostname devops-lab \
-  --privileged --cgroupns=host \
-  -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
-  --tmpfs /run --tmpfs /run/lock \
-  linux-lab:24.04
-
-docker exec linux-lab systemctl is-system-running
+  --privileged --cgroupns=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+  --tmpfs /run --tmpfs /run/lock linux-lab:24.04
 ```
 
-```
-running
-```
-
-Environment every command below was executed in:
-
-```
-$ cat /etc/os-release | head -3
-PRETTY_NAME="Ubuntu 24.04.4 LTS"
-NAME="Ubuntu"
-VERSION_ID="24.04"
-
-$ uname -a
-Linux devops-lab 6.12.76-linuxkit #1 SMP Fri May 29 10:00:01 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
-
-$ hostname
-devops-lab
-```
+Dockerfile, scripts and full transcripts: [`lab/`](lab/)
 
 ---
 

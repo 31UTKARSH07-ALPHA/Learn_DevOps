@@ -5,14 +5,6 @@
 
 ---
 
-> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
-> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
-> commands** shown above them, so the text in every image is the genuine output of that run — the
-> raw transcripts are committed alongside this file. They are provided in addition to the text
-> blocks so the output is both readable as an image and selectable as text.
-
----
-
 ## Task: Hello World Applications
 
 Create simple **Hello World** web applications using Docker for:
@@ -94,25 +86,16 @@ node-hello      latest    194MB
 
 ### A note on ports
 
-The task does not fix the host ports. I used 3002–3007 rather than starting at 3001, because **port 3001 was already in use** on my machine by an unrelated `node` process:
-
-```bash
-lsof -nP -iTCP:3001 -sTCP:LISTEN
-```
-
-```
-COMMAND   PID   USER               FD   TYPE  DEVICE  SIZE/OFF  NODE  NAME
-node      16507 utkarshpathak3107  23u  IPv6  0x...   0t0       TCP   *:3001 (LISTEN)
-```
-
-The first attempt failed with a real error, which is worth recording because it is the single most common Docker mistake:
+The task does not fix the host ports. I used 3002–3007 instead of starting at 3001, because port
+3001 was already taken on my machine by an unrelated `node` process:
 
 ```
 docker: Error response from daemon: ports are not available:
 exposing port TCP 0.0.0.0:3001 -> 127.0.0.1:0: listen tcp 0.0.0.0:3001: bind: address already in use
 ```
 
-The container port never changes — it is baked into the image. Only the **host** side of `-p host:container` needs to be free.
+The container port never changes — it is baked into the image. Only the **host** side of
+`-p host:container` needs to be free.
 
 ---
 
@@ -746,27 +729,28 @@ docker rm -f hello-node hello-python hello-java hello-apache hello-react hello-n
 
 ## What I took away
 
-**The Dockerfile pattern is the same every time**, regardless of language:
+**The Dockerfile pattern is the same every time**, whatever the language:
 
-1. `FROM` a base image with the runtime already in it
+1. `FROM` a base image with the runtime
 2. `WORKDIR` to set where things happen
-3. `COPY` the dependency manifest and install dependencies — **before** the source, for layer caching
+3. `COPY` the dependency manifest and install — **before** the source, for layer caching
 4. `COPY` the application code
 5. `EXPOSE` to document the port
-6. `CMD` to define the long-running foreground process
+6. `CMD` to run a long-lived foreground process
 
-**Things that actually bit me, and are the real lessons:**
+**Mistakes that actually bit me:**
 
-- **Bind to `0.0.0.0`, never `127.0.0.1`.** A container-local bind is unreachable from the host whatever `-p` says.
+- **Bind to `0.0.0.0`, not `127.0.0.1`** — a container-local bind is unreachable from the host whatever `-p` says.
 - **`EXPOSE` publishes nothing.** Only `-p host:container` does.
-- **The main process must stay in the foreground.** The container exits when it exits.
-- **Host ports collide with whatever else is on your machine** — `docker run` gave me a hard `address already in use` error on 3001, and `lsof -nP -iTCP:3001 -sTCP:LISTEN` is how you find the culprit.
-- **Base image tags disappear.** `openjdk:21-jdk-slim` is deprecated and simply does not resolve; `eclipse-temurin` replaced it.
-- **Web server document roots differ** — `/usr/share/nginx/html` vs `/usr/local/apache2/htdocs`. Getting it wrong silently serves the default page.
-- **Client-rendered apps cannot be verified with `curl`.** React's served HTML contains no `<h1>` at all; only a real browser proves it works.
+- **The main process must stay in the foreground**, or the container exits.
+- **Host ports collide** with whatever else is running — `lsof -nP -iTCP:<port> -sTCP:LISTEN` finds the culprit.
+- **Base image tags disappear** — `openjdk:21-jdk-slim` is deprecated; `eclipse-temurin` replaced it.
+- **Document roots differ** — `/usr/share/nginx/html` vs `/usr/local/apache2/htdocs`. Wrong path silently serves the default page.
+- **Client-rendered apps cannot be verified with `curl`** — React's served HTML has no `<h1>` at all.
 
-**On image size**, the six span 102MB to 555MB for what is essentially the same page:
+**On image size** (102MB to 555MB for the same page):
 
-- Alpine bases are dramatically smaller (`nginx:alpine` 102MB vs `httpd:2.4` 205MB)
-- A JDK is heavy (555MB) because it carries a full compiler
-- The multi-stage React build is joint-smallest at 102MB, even though it is the most complex app — because the build toolchain is discarded before the final image is assembled. That idea is the whole subject of the next assignment.
+- Alpine bases are much smaller — `nginx:alpine` 102MB vs `httpd:2.4` 205MB
+- A JDK is heavy at 555MB, because it carries a compiler
+- The multi-stage React build is joint-smallest at 102MB despite being the most complex app, because
+  the build toolchain is discarded. That is the subject of the next assignment.

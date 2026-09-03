@@ -36,9 +36,10 @@ All seven homework assignments, each with a `README.md` containing the commands 
 
 Everything in these READMEs came from running the flow end to end on my own machine:
 
-- **Terminal output** is pasted as captured text, including the commands that failed and why.
-- **Screenshots** are real browser captures of my own running containers — 13 of them.
-- **Raw transcripts** and the scripts that produced them are committed alongside, under `Linux_Fundamentals/lab/` and `Networking_Fundamentals/lab/`, so any of it can be re-run.
+- **Output** is shown as captured text and as terminal screenshots, including the commands that failed and why.
+- **Browser screenshots** are real captures of the pages served by my own running containers.
+- **Terminal screenshots** are rendered from the captured output of those same commands.
+- **Raw transcripts** and the scripts that produced them are committed under `*/lab/`, so any of it can be re-run.
 
 Where something behaved differently than the task expected — a deprecated base image, a port already in use, a Docker Desktop platform limitation, a truncated HTTP response — it is documented with the actual error and the fix, rather than smoothed over.
 

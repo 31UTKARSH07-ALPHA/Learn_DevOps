@@ -5,33 +5,17 @@
 
 ---
 
-> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
-> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
-> commands** shown above them, so the text in every image is the genuine output of that run — the
-> raw transcripts are committed alongside this file. They are provided in addition to the text
-> blocks so the output is both readable as an image and selectable as text.
-
----
-
 ## Tasks
 
 **Task 1** — Practice the commands and repo shared in the `devops-heros` GitHub repo.
 **Task 2** — Create a Markdown file, execute the networking commands, add the output, and add a short explanation of what I understood about each command.
 
-This file is that deliverable. Every block below is **real output from my own run**, not copied.
-
 ### Where it was run
 
-macOS does not ship `ip`, `ss`, `tracepath`, `traceroute` or `nslookup` in the forms this homework uses (macOS has `ifconfig`/`netstat` instead). So I ran everything inside the same Ubuntu 24.04 container used for the Linux Fundamentals homework, which has real `iproute2`, `dnsutils` and `traceroute` installed and genuine internet access.
+macOS does not have `ip`, `ss`, `tracepath` or `traceroute`, so I ran these in an Ubuntu 24.04
+container with real network tooling and internet access.
 
-Script and full transcript: [`lab/net_task.sh`](lab/net_task.sh), [`lab/net_output.txt`](lab/net_output.txt).
-
-Each command below shows the output twice: once as selectable text, and once as a terminal
-screenshot rendered from the same captured session transcript.
-
-```
-Ubuntu 24.04.4 LTS  |  hostname devops-lab  |  container IP 172.17.0.2  |  gateway 172.17.0.1
-```
+Script and full transcript: [`lab/net_task.sh`](lab/net_task.sh), [`lab/net_output.txt`](lab/net_output.txt)
 
 ---
 
@@ -619,29 +603,31 @@ For reference, `nc -zv host port` is the cleaner modern equivalent for a pure po
 
 ---
 
-## What I took away overall
+## What I took away
 
-The commands split into layers, and the real skill is knowing which layer you are testing so you can bisect a problem instead of guessing:
+The commands split into layers, and the skill is knowing which layer you are testing:
 
 | Layer | Question | Commands |
 |---|---|---|
 | Identity | Who and where am I? | `hostname`, `hostname -I`, `whoami`, `id` |
 | Interface | Do I have an IP? | `ip a` |
-| Routing | Where do my packets go? | `ip route`, `ip route get` |
+| Routing | Where do my packets go? | `ip route` |
 | Reachability | Can I reach that host? | `ping`, `telnet` |
 | Path | What route do they take? | `traceroute`, `tracepath` |
-| Naming | Does the name resolve, and to what? | `nslookup`, `/etc/hosts`, `/etc/resolv.conf` |
+| Naming | Does the name resolve? | `nslookup`, `/etc/hosts` |
 | Local sockets | What is listening here? | `ss -tuln` |
-| Application | Does the service actually work? | `curl` |
+| Application | Does the service work? | `curl` |
 
-A practical order for debugging "the website is down", working up the stack:
+A practical order for debugging "the website is down":
 
-1. `ip a` — do I even have an address?
+1. `ip a` — do I have an address?
 2. `ip route` — is there a default gateway?
-3. `ping <gateway>` — is the local network alive?
-4. `ping 8.8.8.8` — is the internet reachable by IP? *(isolates DNS out)*
-5. `nslookup <site>` — does the name resolve? *(if 4 works but this fails, it is DNS)*
-6. `curl -I https://<site>` — is the application returning 200?
-7. `ss -tuln` — if it is my own server, is it even listening, and on the right address?
+3. `ping 8.8.8.8` — internet reachable by IP? *(rules DNS out)*
+4. `nslookup <site>` — does the name resolve? *(if 3 works and this fails, it is DNS)*
+5. `curl -I https://<site>` — is the app returning 200?
+6. `ss -tuln` — if it is my server, is it listening on the right address?
 
-The two things this run taught me that a textbook would not have: `* * *` in a traceroute is usually a **probe type** being filtered rather than a broken route, and `telnet` returning a protocol error still proves the TCP layer works perfectly.
+Two things this run taught me that a textbook would not:
+
+- `* * *` in a traceroute usually means the **probe type** is filtered, not that the route is broken.
+- `telnet` returning an HTTP error still proves the TCP layer works.

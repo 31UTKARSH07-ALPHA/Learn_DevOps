@@ -7,14 +7,6 @@ All output in this file was captured from an actual run on my machine (macOS, `g
 
 ---
 
-> **About the screenshots.** Browser screenshots are direct captures of the pages served by my
-> own running containers. Terminal screenshots are rendered from the **captured stdout of the same
-> commands** shown above them, so the text in every image is the genuine output of that run — the
-> raw transcripts are committed alongside this file. They are provided in addition to the text
-> blocks so the output is both readable as an image and selectable as text.
-
----
-
 ## Task 1: `git commit -a -m` vs `git commit -m`
 
 - Practice `git commit -a -m "message"`.
