@@ -2,7 +2,7 @@
 
 DevOps class assignments — **Utkarsh Pathak**, Enrollment No **24bcs10309**.
 
-All ten homework assignments, each with a `README.md` containing the commands I ran, the **real output** captured from those runs, and an explanation of what the output means.
+All eleven homework assignments, each with a `README.md` containing the commands I ran, the **real output** captured from those runs, and an explanation of what the output means.
 
 ## Class Assignments
 
@@ -15,11 +15,10 @@ All ten homework assignments, each with a `README.md` containing the commands I 
 | 5 | Docker Fundamentals | [`Class_Assignments/Docker_Fundamental/README.md`](Class_Assignments/Docker_Fundamental/README.md) |
 | 6 | DockerFiles & Images | [`Class_Assignments/DockerFiles_&_Images/README.md`](Class_Assignments/DockerFiles_&_Images/README.md) |
 | 7 | Docker Networking & Volumes | [`Class_Assignments/Docker_Network/README.md`](Class_Assignments/Docker_Network/README.md) |
-| 8 | Kubernetes Core Objects (Session 10) | [`Class_Assignments/Kubernetes/Session-10-K8s-Core-Objects/README.md`](Class_Assignments/Kubernetes/Session-10-K8s-Core-Objects/README.md) |
-| 9 | Kubernetes Services (Session 11) | [`Class_Assignments/Kubernetes/Session-11-Kubernetes-Services/README.md`](Class_Assignments/Kubernetes/Session-11-Kubernetes-Services/README.md) |
-| 10 | Ingress, ConfigMaps & Secrets (Session 12) | [`Class_Assignments/Kubernetes/Session-12-Ingress-ConfigMaps-Secrets/README.md`](Class_Assignments/Kubernetes/Session-12-Ingress-ConfigMaps-Secrets/README.md) |
-
-All three Kubernetes sessions are indexed together in [`Class_Assignments/Kubernetes/README.md`](Class_Assignments/Kubernetes/README.md).
+| 8 | Kubernetes Fundamentals | [`Class_Assignments/Kubernetes_Fundamentals/README.md`](Class_Assignments/Kubernetes_Fundamentals/README.md) |
+| 9 | Kubernetes Pods, ReplicaSet & Deployment | [`Class_Assignments/Kubernetes_Pods_Rs_Deployment/README.md`](Class_Assignments/Kubernetes_Pods_Rs_Deployment/README.md) |
+| 10 | Kubernetes Networking & Services | [`Class_Assignments/Kubernetes_Networking_and_Services/README.md`](Class_Assignments/Kubernetes_Networking_and_Services/README.md) |
+| 11 | Kubernetes Ingress, ConfigMaps & Secrets | [`Class_Assignments/Kubernetes_Ingress_Configmaps_Secrets/README.md`](Class_Assignments/Kubernetes_Ingress_Configmaps_Secrets/README.md) |
 
 ## What each assignment covers
 
@@ -37,11 +36,13 @@ All three Kubernetes sessions are indexed together in [`Class_Assignments/Kubern
 
 **7. Docker Networking & Volumes** — three containers across three networks with the backend multi-homed and cross-tier isolation proved, Apache on the host network, a bind mount updating live with no restart, and a **real overlay network** built in swarm mode.
 
-**8. Kubernetes Core Objects** — the five workload objects (Pod, ReplicaSet, Deployment, DaemonSet, StatefulSet), the full Pod lifecycle including `Pending`, `CrashLoopBackOff` and `ImagePullBackOff` triggered on purpose and diagnosed, and all four rollout strategies — **rolling update, blue-green, canary and recreate** — with the traffic measured during each switch, including the deliberate outage `Recreate` causes.
+**8. Kubernetes Fundamentals** — why Kubernetes over Docker Swarm, the control plane and node components shown running as pods in `kube-system`, namespaced vs cluster-scoped objects, and what actually happens between `kubectl apply` and a running container.
 
-**9. Kubernetes Services** — all five Service types (ClusterIP, NodePort, LoadBalancer, ExternalName, headless), what each creates in the cluster, CoreDNS resolving service FQDNs, per-pod DNS records for a StatefulSet, and an endpoint-triage drill on a Service whose selector does not match its pods.
+**9. Kubernetes Pods, ReplicaSet & Deployment** — the five workload objects (Pod, ReplicaSet, Deployment, DaemonSet, StatefulSet), the full Pod lifecycle including `Pending`, `CrashLoopBackOff` and `ImagePullBackOff` triggered on purpose and diagnosed, and all four rollout strategies — **rolling update, blue-green, canary and recreate** — with the traffic measured during each switch, including the deliberate outage `Recreate` causes.
 
-**10. Ingress, ConfigMaps & Secrets** — configuration kept out of the image with ConfigMaps and Secrets, the **base64 trailing-newline trap** that silently breaks Secret passwords shown byte by byte with `xxd`, and one NGINX Ingress doing host and path-based routing to a frontend and a backend that read from both objects.
+**10. Kubernetes Networking & Services** — all five Service types (ClusterIP, NodePort, LoadBalancer, ExternalName, headless), what each creates in the cluster, CoreDNS resolving service FQDNs, per-pod DNS records for a StatefulSet, and an endpoint-triage drill on a Service whose selector does not match its pods.
+
+**11. Kubernetes Ingress, ConfigMaps & Secrets** — configuration kept out of the image with ConfigMaps and Secrets, the **base64 trailing-newline trap** that silently breaks Secret passwords shown byte by byte with `xxd`, and one NGINX Ingress doing host and path-based routing to a frontend and a backend that read from both objects.
 
 ## Evidence
 

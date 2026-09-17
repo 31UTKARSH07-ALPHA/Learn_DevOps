@@ -8,7 +8,7 @@ driver), Kubernetes `v1.37.0`, macOS on Apple Silicon (`arm64`). The manifests a
 the class repo, `session-11-kubernetes-services`. Raw transcripts are in [`lab/`](lab/).
 
 A Service exists because Pod IPs are disposable. Every rollout in
-[Session 10](../Session-10-K8s-Core-Objects/README.md) replaced every pod IP in the cluster —
+[Session 10](../Kubernetes_Pods_Rs_Deployment/README.md) replaced every pod IP in the cluster —
 a Service is the stable name and virtual IP that survives that.
 
 ---
@@ -480,7 +480,7 @@ There is the whole diagnosis in three commands. The Service selects `app=wrong-b
 the pods are labelled `app=yatri-backend`; querying the Service's own selector returns nothing.
 
 Unlike the Deployment selector mismatch in
-[Session 10, Task 7](../Session-10-K8s-Core-Objects/README.md) — which the API server rejected
+[Session 10, Task 7](../Kubernetes_Pods_Rs_Deployment/README.md) — which the API server rejected
 outright — this one is **accepted**, because a Service selector matching nothing is legal. It
 has to be: the Service often exists before the pods do. That is exactly why `kubectl get
 endpoints` is the first command to run when a Service is not answering.

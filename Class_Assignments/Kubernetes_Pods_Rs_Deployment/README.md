@@ -12,7 +12,7 @@ One thing worth saying up front: the class material reaches the app with
 node lives on an internal bridge the host cannot route to. So every in-cluster test below runs
 from a small `curlimages/curl` pod inside the cluster, and the one place a host-side URL is
 actually the point uses `minikube service --url`. The failure itself is shown in
-[Session 11, Task 2](../Session-11-Kubernetes-Services/README.md).
+[Session 11, Task 2](../Kubernetes_Networking_and_Services/README.md).
 
 ---
 
@@ -801,7 +801,7 @@ Rejected outright by the API server — nothing was created, so there is no pod 
 the better class of failure: validation catches it at `apply` time rather than leaving a
 Deployment that manages zero pods forever. The same mistake on a **Service** is not caught,
 because a Service selector is allowed to match nothing — that failure mode is in
-[Session 11, Task 7](../Session-11-Kubernetes-Services/README.md).
+[Session 11, Task 7](../Kubernetes_Networking_and_Services/README.md).
 
 ![The API server rejecting the deployment because its selector does not match its template labels](images/task7-2-selector-mismatch.png)
 

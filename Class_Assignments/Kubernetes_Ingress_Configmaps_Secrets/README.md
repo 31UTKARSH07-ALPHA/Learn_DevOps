@@ -211,7 +211,7 @@ ingress-nginx-controller   NodePort   10.111.241.145   <none>        80:31994/TC
 ```
 
 The controller is an ordinary Deployment behind an ordinary NodePort Service — the same
-primitives from [Session 11](../Session-11-Kubernetes-Services/README.md). All an Ingress does
+primitives from [Session 11](../Kubernetes_Networking_and_Services/README.md). All an Ingress does
 is reprogram this one nginx instead of creating more Services.
 
 ![The ingress-nginx controller pod running with its NodePort service on ports 80 and 443](images/task3-1-ingress-controller-ready.png)
@@ -240,7 +240,7 @@ I applied the Ingress before deploying the apps, which turned out to be informat
 **`<error: services ... not found>`**. The Ingress was accepted and the controller synced it
 anyway — an Ingress pointing at a non-existent Service is valid, and only shows up as a 503 at
 request time. Same principle as the empty-endpoints Service in
-[Session 11, Task 7](../Session-11-Kubernetes-Services/README.md): Kubernetes lets you wire
+[Session 11, Task 7](../Kubernetes_Networking_and_Services/README.md): Kubernetes lets you wire
 things up in any order, so "created successfully" is not the same as "working".
 
 ![The Ingress accepted with both routing rules, each reporting that its backend Service does not exist yet](images/task3-2-ingress-object.png)
@@ -301,7 +301,7 @@ kubectl describe ingress yatri-ingress
 
 The class material adds a hosts entry with `sudo tee -a /etc/hosts`. That needs a password and
 permanently edits a system file, and on the Docker driver `minikube ip` is not routable from
-macOS anyway (shown in [Session 11, Task 2](../Session-11-Kubernetes-Services/README.md)). Port-
+macOS anyway (shown in [Session 11, Task 2](../Kubernetes_Networking_and_Services/README.md)). Port-
 forwarding the controller and sending the hostname as a header proves the same routing without
 either problem:
 
