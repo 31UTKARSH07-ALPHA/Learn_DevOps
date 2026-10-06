@@ -2,7 +2,7 @@
 
 DevOps class assignments — **Utkarsh Pathak**, Enrollment No **24bcs10309**.
 
-All eleven homework assignments, each with a `README.md` containing the commands I ran, the **real output** captured from those runs, and an explanation of what the output means.
+All nineteen homework assignments, each with a `README.md` containing the commands I ran, the **real output** captured from those runs, and an explanation of what the output means.
 
 ## Class Assignments
 
@@ -19,6 +19,14 @@ All eleven homework assignments, each with a `README.md` containing the commands
 | 9 | Kubernetes Pods, ReplicaSet & Deployment | [`Class_Assignments/Kubernetes_Pods_Rs_Deployment/README.md`](Class_Assignments/Kubernetes_Pods_Rs_Deployment/README.md) |
 | 10 | Kubernetes Networking & Services | [`Class_Assignments/Kubernetes_Networking_and_Services/README.md`](Class_Assignments/Kubernetes_Networking_and_Services/README.md) |
 | 11 | Kubernetes Ingress, ConfigMaps & Secrets | [`Class_Assignments/Kubernetes_Ingress_Configmaps_Secrets/README.md`](Class_Assignments/Kubernetes_Ingress_Configmaps_Secrets/README.md) |
+| 12 | Kubernetes Storage, HPA & Probes | [`Class_Assignments/Kubernetes_Storage_HPA_Probes/README.md`](Class_Assignments/Kubernetes_Storage_HPA_Probes/README.md) |
+| 13 | Kubernetes Troubleshooting | [`Class_Assignments/Kubernetes_Troubleshooting/README.md`](Class_Assignments/Kubernetes_Troubleshooting/README.md) |
+| 14 | Helm | [`Class_Assignments/Helm/README.md`](Class_Assignments/Helm/README.md) |
+| 15 | CI/CD & GitHub Actions | [`Class_Assignments/CICD_GitHub_Actions/README.md`](Class_Assignments/CICD_GitHub_Actions/README.md) |
+| 16 | Complete CI/CD & DevSecOps | [`Class_Assignments/DevSecOps/README.md`](Class_Assignments/DevSecOps/README.md) |
+| 17 | Terraform & Infrastructure as Code | [`Class_Assignments/Terraform/README.md`](Class_Assignments/Terraform/README.md) |
+| 18 | Cloud & Terraform in Action | [`Class_Assignments/Cloud_and_Terraform_in_Action/README.md`](Class_Assignments/Cloud_and_Terraform_in_Action/README.md) |
+| 19 | Monitoring, Observability & GitOps | [`Class_Assignments/Monitoring_Observability_GitOps/README.md`](Class_Assignments/Monitoring_Observability_GitOps/README.md) |
 
 ## What each assignment covers
 
@@ -44,6 +52,22 @@ All eleven homework assignments, each with a `README.md` containing the commands
 
 **11. Kubernetes Ingress, ConfigMaps & Secrets** — configuration kept out of the image with ConfigMaps and Secrets, the **base64 trailing-newline trap** that silently breaks Secret passwords shown byte by byte with `xxd`, and one NGINX Ingress doing host and path-based routing to a frontend and a backend that read from both objects.
 
+**12. Kubernetes Storage, HPA & Probes** — `emptyDir`, `hostPath`, static PV/PVC and dynamic provisioning, each shown keeping (or losing) data when a Pod is deleted; an HPA scaling **1 → 4 → 5** pods at 337% CPU and back down after the 5-minute stabilization window; and a mini project whose liveness probe catches a broken container and restarts it.
+
+**13. Kubernetes Troubleshooting** — the `get → describe → logs → exec` order, then `CrashLoopBackOff`, `ImagePullBackOff`, `Pending`, Service selector and DNS problems each broken on purpose, diagnosed and fixed.
+
+**14. Helm** — every core Helm command, and a rollback workflow where the second upgrade is a deliberately broken image tag that Helm marks `failed` and `helm rollback` repairs; plus the Notes chart deployed with dev values, upgraded to prod values, and rolled back.
+
+**15. CI/CD & GitHub Actions** — a calculator API with test, build/artifact, security-check, Docker build & push and deploy jobs; runs showing a full pass, a pull request where CD is skipped, and a failing test that stops the pipeline.
+
+**16. Complete CI/CD & DevSecOps** — Build → Unit Test → SAST (Bandit) → SCA (pip-audit) → Secret Scan (Gitleaks) → Docker Build → Image Scan (Trivy) → Security Gate → Push → Deploy to Kubernetes. The gate blocked the class app's `debug=True`, then 20 HIGH/CRITICAL CVEs in a stale base image, then passed and deployed; a fourth run proves the secret and dependency scanners.
+
+**17. Terraform & IaC** — an S3 bucket taken through `init → fmt → validate → plan → apply → show → output → destroy`, including drift caught by a second plan, plus research notes on IAM, EC2, S3, VPC, DynamoDB and RDS.
+
+**18. Cloud & Terraform in Action** — VPC, subnet, internet gateway, route table, security group, EC2 with an IAM role, and S3 from one Terraform project: 13 resources, the dependency graph, state, and destroy in reverse order.
+
+**19. Monitoring, Observability & GitOps** — Prometheus, Grafana and 4 alert rules fired by a simulated incident; metrics, JSON logs and OpenTelemetry traces linked by `trace_id`; and Argo CD syncing a Kubernetes app from Git — including a bad commit it refused, self-heal of manual `kubectl` changes, prune, and rollback by `git revert`.
+
 ## Evidence
 
 Everything in these READMEs came from running the flow end to end on my own machine:
@@ -63,6 +87,9 @@ Where something behaved differently than the task expected — a deprecated base
 | Docker | `29.5.3`, Docker Desktop |
 | Git | `2.51.0` |
 | Linux environment | Ubuntu 24.04.4 LTS in Docker, with systemd as PID 1 |
+| Kubernetes | Minikube, Kubernetes `v1.37.0` (Kubernetes assignments); kind (DevSecOps deploy target) |
+| CI/CD | GitHub Actions workflows run locally with `act` `v0.2.89` |
+| AWS | Terraform `v1.16.4` against LocalStack `4.0` (an AWS emulator in Docker) |
 
 Linux-only commands (`adduser`, `useradd`, `journalctl`, `ip`, `ss`, `tracepath`, `traceroute`) were run in the Ubuntu container, because macOS does not provide them. The Dockerfile for that environment is committed at [`Class_Assignments/Linux_Fundamentals/lab/Dockerfile`](Class_Assignments/Linux_Fundamentals/lab/Dockerfile).
 
